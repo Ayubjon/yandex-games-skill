@@ -28,7 +28,7 @@ for (const [harness, mode] of [
   const fd = openSync(log, 'w');
   const browser = spawn(chrome, ['--headless', '--no-sandbox', '--disable-gpu',
     '--disable-dev-shm-usage', '--remote-allow-origins=*', '--remote-debugging-port=0',
-    `--user-data-dir=${profile}`, 'about:blank'], { stdio: ['ignore', fd, fd] });
+    `--user-data-dir=${profile}`, 'about:blank'], { stdio: ['ignore', fd, fd], detached: process.platform !== 'win32' });
   closeSync(fd);
   let spawnError;
   const closed = new Promise(resolve => {
@@ -51,13 +51,26 @@ for (const [harness, mode] of [
     if (result.error) throw result.error;
     if (result.status !== 0) throw new Error(`${harness} ${mode || ''} failed: ${result.status ?? result.signal}`);
   } finally {
-    if (browser.exitCode === null && browser.signalCode === null && !spawnError) {
-      browser.kill('SIGTERM');
-      await Promise.race([closed, sleep(5000)]);
-      if (browser.exitCode === null && browser.signalCode === null) {
-        browser.kill('SIGKILL');
-        await closed;
-      }
+    if (browser.pid && !spawnError) {
+      // Chrome's main process can exit before renderer/utility processes stop
+      // writing the profile. Terminate our isolated process group, not just PID.
+      const terminate = signal => {
+        try {
+          if (process.platform === 'win32') {
+            spawnSync('taskkill', ['/PID', String(browser.pid), '/T', '/F'], { stdio: 'ignore' });
+          } else {
+            process.kill(-browser.pid, signal);
+          }
+        } catch (error) {
+          if (error.code !== 'ESRCH') throw error;
+        }
+      };
+      terminate('SIGTERM');
+      let timer;
+      await Promise.race([closed, new Promise(resolve => { timer = setTimeout(resolve, 5000); })]);
+      clearTimeout(timer);
+      terminate('SIGKILL');
+      await closed;
     }
     // Chrome subprocesses may finish profile writes just after the main exit.
     rmSync(temp, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
