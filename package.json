@@ -1,0 +1,17 @@
+{
+  "name": "yandex-games-dev-skill",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Yandex Games integration skill with a pinned 93-check diagnostic toolkit",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "python3 scripts/verify_vendor.py && node --check assets/ya-sdk.js && node tests/sdk-wrapper.cjs && python3 -m unittest discover -s tests -p 'test_*.py' && npm --prefix vendor/yandex-games-debug-checker test",
+    "test:browser": "node scripts/browser-tests.mjs",
+    "catalog": "python3 scripts/generate_catalog.py",
+    "test:demo": "node scripts/test-demo.mjs",
+    "audit": "npm test && npm run test:browser && npm run test:demo"
+  },
+  "license": "MIT"
+}

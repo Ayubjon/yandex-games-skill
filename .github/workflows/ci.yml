@@ -1,0 +1,26 @@
+name: Skill and checker audit
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Locate browser
+        run: echo "CHROME_BIN=$(command -v google-chrome)" >> "$GITHUB_ENV"
+      - name: Validate skill toolkit and original checker
+        run: npm run audit

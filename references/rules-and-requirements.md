@@ -1,52 +1,35 @@
-# Yandex Games — rules & requirements (read the LIVE pages first)
+# Rules and authoritative sources
 
-> ⚠️ **Yandex changes these rules.** This file is a *starting checklist*, not the
-> source of truth. Open the official pages below and read the current rules
-> **before building** and **before every submission**.
+The main practical baseline is the pinned [Nioris checker](upstream.md). Its tests are unofficial and sometimes stricter or less precise than the rules. Official pages were reviewed for this revision on **2026-09-26**; fetch relevant pages again when applying this skill. Record rule changes instead of treating this date as perpetual verification.
 
-## Authoritative pages — open these
-- Requirements: https://yandex.com/dev/games/doc/en/concepts/requirements
-- Moderation: https://yandex.com/dev/games/doc/en/concepts/moderation
-- Quick start: https://yandex.com/dev/games/doc/en/concepts/quick-start
-- Upload a game: https://yandex.com/dev/games/doc/en/console/add-new-game
-- Testing a draft: https://yandex.com/dev/games/doc/en/console/test-game
-- Docs hub — RU: https://yandex.ru/dev/games/doc/dg/ · EN: https://yandex.com/dev/games/doc/en/
+## Source map
 
-## Technical requirements (verify on the live page)
-- The **Yandex Games SDK must be integrated**.
-- You **must call `LoadingAPI.ready()`** when the player can start playing (this hides
-  the platform loader). Forgetting it is a frequent rejection.
-- The game must **pause audio when the page is minimized / loses focus**, and be pausable.
-- The UI must **render correctly on resize** — nothing cut off by screen bounds.
-- Package: a **ZIP with `index.html` in the archive root**; use **relative paths**;
-  HTTPS only; uncompressed size limit around **100 MB** (verify the current number).
-- All transactions go **through the SDK only**.
+| Decision | Official source |
+|---|---|
+| Full current rules, content, archive and recommendations | https://yandex.ru/dev/games/doc/ru/concepts/requirements |
+| Moderation process | https://yandex.ru/dev/games/doc/ru/concepts/moderation |
+| SDK loader and initialization | https://yandex.ru/dev/games/doc/ru/sdk/sdk-about |
+| Ready and optional lifecycle | https://yandex.ru/dev/games/doc/ru/requirements/1/19 and https://yandex.ru/dev/games/doc/ru/sdk/sdk-game-events |
+| Saving policy and player methods | https://yandex.ru/dev/games/doc/ru/requirements/1/9 and https://yandex.ru/dev/games/doc/ru/sdk/sdk-player |
+| Language detection and fallback | https://yandex.ru/dev/games/doc/ru/requirements/2/14 and https://yandex.ru/dev/games/doc/ru/sdk/sdk-environment |
+| Ad placement and API | https://yandex.ru/dev/games/doc/ru/requirements/4/4 and https://yandex.ru/dev/games/doc/ru/sdk/sdk-adv |
+| Catalog, purchase recovery and signing | https://yandex.ru/dev/games/doc/ru/sdk/sdk-purchases |
+| Current leaderboard methods | https://yandex.ru/dev/games/doc/ru/sdk/sdk-leaderboard |
+| Console/upload/testing | https://yandex.ru/dev/games/doc/ru/console/add-new-game and https://yandex.ru/dev/games/doc/ru/console/test-game |
 
-## Prohibited / restricted content (this list changes — verify)
-- No gambling, real-money operations or withdrawal, online store, or lottery.
-- No realistic violence against children/animals; per current docs also no political,
-  religious, or "magical" content, no interactive-AI, no YouTube video integration,
-  no third-party ads.
-- You must **own the copyright** to every asset; no clones of existing games.
-- Provide a developer/publisher **contact email**.
+If a deep link moves, follow navigation from https://yandex.ru/dev/games/doc/ru/ rather than assuming the old behavior still holds.
 
-## Moderation pipeline
-- **Full moderation** (~3–5 business days): first publish and any build change — the
-  moderator tests the build and reviews promo materials.
-- **Content moderation** (~1–2 days): when only promo materials change.
-- Statuses: **Draft → (Verified | Published | Rejected)**.
-- Resubmission is unlimited, but the **wait doubles after each rejection** (24 h → ~16 days).
-- A published game must keep a **rating above 30** or it can be unpublished after ~3 weeks.
+## Corrections to the former skill
 
-## Common rejection reasons — pre-empt these
-- `LoadingAPI.ready()` never called / loader never hides.
-- **Interface not translated into all declared languages.**
-- **Incorrect ad setup** (ads on every action, ads blocking gameplay, too frequent).
-- Crashes, hangs, or console errors.
-- **Name mismatch** between the game and its promo materials.
-- **Age rating** doesn't match the actual content.
-- UI elements **cropped** by screen bounds.
-- **Duplicate** of a game already in the catalog.
-- Promo screenshots not showing real gameplay (need ~70% gameplay).
+- Browser storage is not universally forbidden; choose from the current saving policy. Cloud persistence is required for IAP.
+- Game Ready is separate from SDK initialization. Gameplay markup and platform pause-event subscriptions are optional, with correctness requirements if adopted.
+- There is no fixed requirement to ship 13 languages; inspect the languages declared in the draft.
+- An eight/ten-second checker warning is not the documented 90-second Game Ready diagnostic window.
+- Interstitial placement depends on game type and context, not a blanket “every ad must follow a click.” Rewarded remains voluntary.
+- Do not describe all fantasy/magic as prohibited: inspect the specific content clause. Avoid broad invented content bans.
+- Recommendations (section 6), engineering heuristics and mandatory requirements have different weight. Contact email, sound toggle and pause recommendations are not universal hard-fail criteria.
+- Do not hardcode moderation turnaround, retry delays or plugin compatibility from old notes. Read the current console/docs when needed.
 
-> Re-check every item against the live pages above before submitting — Yandex updates them.
+## Beyond automatic detection
+
+Manually inspect content/rights, age suitability, core gameplay depth, meaningful controls, full translations, product delivery, draft metadata and real-device behavior. Refer to the actual clause in a finding and separate fact from inference. A rule number attached to a regex does not make its inference authoritative.

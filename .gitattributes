@@ -1,0 +1,2 @@
+# Preserve upstream bytes, including CRLF CSV, for SHA-256 provenance checks.
+vendor/yandex-games-debug-checker/** -text
